@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Large File Splitter</title>
+  <style>
+    body {
+      background-color: #000; /* Black background */
+      color: #fff;           /* White text for contrast */
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    h1 {
+      color: #00ff7f; /* Neon green title */
+      cursor: pointer; /* Indicate that the title is clickable */
+    }
+
+    input[type="file"],
+    input[type="number"],
+    button {
+      margin: 10px 0;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    input[type="file"] {
+      background-color: #333;
+      color: #fff;
+    }
+
+    input[type="number"] {
+      background-color: #222;
+      color: #fff;
+      width: 200px;
+    }
+
+    button {
+      background-color: #00ff7f; /* Neon green button */
+      color: #000;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #00cc66; /* Darker green on hover */
+    }
+
+    #output {
+      margin-top: 20px;
+    }
+
+    a {
+      color: #00ff7f;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .snowflake {
+      position: fixed;
+      top: -10px;
+      color: white;
+      font-size: 1em;
+      user-select: none;
+      z-index: 1000;
+      animation: fall linear infinite;
+    }
+
+    @keyframes fall {
+      0% {
+        transform: translateY(-100px);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh);
+        opacity: 0.5;
+      }
+    }
+
+    .logo {
+      max-width: 100%;
+      height: auto;
+      margin: 20px auto;
+    }
+
+    footer {
+      margin-top: 50px;
+      font-size: 14px;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <img src="https://c.top4top.io/p_3277o6iyd0.gif" class="logo" alt="Logo">
+  <h1 id="title">Large File Splitter (Up to 5GB)</h1>
+  <input type="file" id="fileInput" />
+  <input type="number" id="chunkSize" placeholder="Chunk size in MB" />
+  <button id="splitButton">Split File</button>
+  <div id="output"></div>
+
+  <audio id="bgMusic" src="https://d.top4top.io/m_3277jsv640.mp3" preload="auto"></audio>
+</div>
+
+<footer>
+  Created by Mr. Hacky
+</footer>
+
+<script>
+  // Snowfall effect
+  const snowflakeCount = 30; // Number of snowflakes
+  const snowflakeEmoji = "❄️️"; // Snowflake character
+
+  function createSnowflake() {
+    const snowflake = document.createElement("div");
+    snowflake.classList.add("snowflake");
+    snowflake.textContent = snowflakeEmoji;
+
+    // Randomize position and animation duration
+    snowflake.style.left = Math.random() * 100 + "vw";
+    snowflake.style.fontSize = Math.random() * 20 + 10 + "px";
+    snowflake.style.animationDuration = Math.random() * 5 + 5 + "s";
+
+    document.body.appendChild(snowflake);
+
+    // Remove snowflake after it falls
+    snowflake.addEventListener("animationend", () => snowflake.remove());
+  }
+
+  setInterval(createSnowflake, 200); // Create snowflakes every 200ms
+
+  // Play background music when the title is clicked
+  document.getElementById("title").addEventListener("click", () => {
+    const bgMusic = document.getElementById("bgMusic");
+    if (bgMusic.paused) {
+      bgMusic.play();
+    } else {
+      bgMusic.pause();
+      bgMusic.currentTime = 0; // Reset music to the beginning
+    }
+  });
+
+  // File splitting logic
+  document.getElementById("splitButton").addEventListener("click", () => {
+    const fileInput = document.getElementById("fileInput").files[0];
+    const chunkSizeMB = parseInt(document.getElementById("chunkSize").value, 10);
+
+    if (!fileInput || isNaN(chunkSizeMB)) {
+      alert("Please upload a file and enter a valid chunk size.");
+      return;
+    }
+
+    const chunkSize = chunkSizeMB * 1024 * 1024; // Convert MB to bytes
+    const outputDiv = document.getElementById("output");
+    outputDiv.innerHTML = ""; // Clear previous output
+
+    let start = 0;
+    let part = 1;
+
+    while (start < fileInput.size) {
+      const end = Math.min(start + chunkSize, fileInput.size);
+      const blob = fileInput.slice(start, end);
+
+      // Create a link to download the chunk
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `${fileInput.name}.part${part}`;
+      link.textContent = `Download Part ${part} (${((end - start) / (1024 * 1024)).toFixed(2)} MB)`;
+      link.style.display = "block";
+
+      outputDiv.appendChild(link);
+
+      start = end;
+      part++;
+    }
+
+    alert(`File split into ${part - 1} parts.`);
+  });
+</script>
+</body>
+</html>
